@@ -8,6 +8,8 @@
 
 微信小程序的http模块，机智得“绕过”最大5个http并发的限制.
 
+![sceenshot](https://github.com/axetroy/wxapp-http/raw/master/screenshot.gif)
+
 ## Installation
 ```bash
 npm install wxapp-http
