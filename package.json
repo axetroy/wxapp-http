@@ -1,6 +1,6 @@
 {
   "name": "wxapp-http",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Http module for WeChat APP",
   "main": "./dist/index.js",
   "scripts": {
@@ -8,8 +8,7 @@
     "build": "webpack --display-error-details --progress --colors",
     "watch": "webpack --display-error-details --progress --colors --watch",
     "generate": "all-contributors generate",
-    "deploy": "gh-pages -d ./dist",
-    "postinstall": "npm run build"
+    "deploy": "gh-pages -d ./dist"
   },
   "keywords": [
     "wxapp",
