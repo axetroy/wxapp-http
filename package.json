@@ -1,0 +1,39 @@
+{
+  "name": "wxapp-http",
+  "version": "0.1.0",
+  "description": "promisify the wx API",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "ava",
+    "build": "webpack --display-error-details --progress --colors",
+    "watch": "webpack --display-error-details --progress --colors --watch",
+    "generate": "all-contributors generate",
+    "deploy": "gh-pages -d ./dist"
+  },
+  "keywords": [
+    "wxapp",
+    "promise",
+    "wx",
+    "promisify"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axetroy/wxapp-http.git"
+  },
+  "author": "Axetroy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/axetroy/wxapp-http/issues"
+  },
+  "homepage": "https://github.com/axetroy/wxapp-http#readme",
+  "devDependencies": {
+    "all-contributors-cli": "^4.0.1",
+    "ava": "^0.18.2",
+    "babel-core": "^6.24.0",
+    "babel-loader": "^6.4.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-es2015": "^6.24.0",
+    "gh-pages": "^0.12.0",
+    "webpack": "^2.3.3"
+  }
+}
