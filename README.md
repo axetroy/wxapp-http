@@ -66,7 +66,7 @@ http.get = function(
 发送POST请求
 
 ```flow js
-http.get = function(
+http.post = function(
   url: string,
   body?: Object | string,
   header?: Object,
