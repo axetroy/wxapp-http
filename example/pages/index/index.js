@@ -10,6 +10,22 @@ http.responseInterceptor(function(config) {
   return true;
 });
 
+http.on('request', function(config) {
+  console.log('event: send request', config.url);
+});
+
+http.on('success', function(config) {
+  console.log('event: request success', config.url);
+});
+
+http.on('fail', function(config) {
+  console.log('event: request fail', config.url);
+});
+
+http.on('complete', function(config) {
+  console.log('event: request complete', config.url);
+});
+
 var app = getApp();
 Page({
   data: {

@@ -1,17 +1,7 @@
 /**
  * Created by axetroy on 17-6-23.
  */
-
-const METHODS = [
-  'OPTIONS',
-  'GET',
-  'HEAD',
-  'POST',
-  'PUT',
-  'DELETE',
-  'TRACE',
-  'CONNECT'
-];
+import EventEmitter from '@axetroy/event-emitter.js';
 
 function requireArgument(argv) {
   throw new Error(`${argv} is required!Please make sure it is not a undefined`);
@@ -21,166 +11,129 @@ function isFunction(func) {
   return typeof func === 'function';
 }
 
-/**
- * http对象
- * @param maxConcurrent   最大http并发数量
- * @constructor
- */
-export function Http(maxConcurrent) {
-  this.__ctx = typeof wx === 'object' ? wx : {};
-  this.__queue = [];
-  this.__maxConcurrent = maxConcurrent;
-  this.__runningTask = 0;
+class Http extends EventEmitter {
+  constructor(maxConcurrent) {
+    super();
+    this.__ctx = typeof wx === 'object' ? wx : {};
+    this.__queue = [];
+    this.__maxConcurrent = maxConcurrent;
+    this.__runningTask = 0;
+  }
+  __next() {
+    const _this = this;
+    const queue = _this.__queue;
+
+    if (queue.length && _this.__runningTask < _this.__maxConcurrent) {
+      const entity = queue.shift();
+      const config = entity.config;
+
+      const requestInterceptor = _this.__requestInterceptor;
+      const responseInterceptor = _this.__responseInterceptor;
+
+      if (
+        isFunction(requestInterceptor) &&
+        requestInterceptor.call(_this, config) !== true
+      ) {
+        entity.reject(
+          new Error(`Request Interceptor: Request can\'t pass the Interceptor`)
+        );
+        return;
+      }
+
+      _this.emit('request', config);
+
+      _this.__runningTask = _this.__runningTask + 1;
+      _this.__ctx.request({
+        ...entity.config,
+        ...{
+          success(res) {
+            entity.__response = res;
+            _this.emit('success', config, res);
+            if (
+              isFunction(responseInterceptor) &&
+              responseInterceptor.call(_this, config, res) !== true
+            ) {
+              entity.reject(res);
+            } else {
+              entity.resolve(res);
+            }
+          },
+          fail(err) {
+            entity.__response = err;
+            _this.emit('fail', config, err);
+            if (
+              isFunction(responseInterceptor) &&
+              responseInterceptor.call(_this, config, err) === true
+            ) {
+              entity.resolve(err);
+            } else {
+              entity.reject(err);
+            }
+          },
+          complete() {
+            _this.emit('complete', config, entity.__response);
+            _this.__next();
+            _this.__runningTask = _this.__runningTask - 1;
+          }
+        }
+      });
+    } else {
+    }
+  }
+  request(
+    method = requireArgument('method'),
+    url = requireArgument('url'),
+    body = '',
+    header = {},
+    dataType = 'json'
+  ) {
+    const _this = this;
+    const config = {
+      method,
+      url,
+      data: body,
+      header,
+      dataType
+    };
+    return new Promise(function(resolve, reject) {
+      _this.__queue.push({ config, promise: this, resolve, reject });
+      _this.__next();
+    });
+  }
+  head(url, body, header, dataType) {
+    return this.request('HEAD', url, body, header, dataType);
+  }
+  options(url, body, header, dataType) {
+    return this.request('OPTIONS', url, body, header, dataType);
+  }
+  get(url, body, header, dataType) {
+    return this.request('GET', url, body, header, dataType);
+  }
+  post(url, body, header, dataType) {
+    return this.request('POST', url, body, header, dataType);
+  }
+  put(url, body, header, dataType) {
+    return this.request('PUT', url, body, header, dataType);
+  }
+  ['delete'](url, body, header, dataType) {
+    return this.request('DELETE', url, body, header, dataType);
+  }
+  trace(url, body, header, dataType) {
+    return this.request('TRACE', url, body, header, dataType);
+  }
+  connect(url, body, header, dataType) {
+    return this.request('CONNECT', url, body, header, dataType);
+  }
+  requestInterceptor(func) {
+    this.__requestInterceptor = func;
+  }
+  responseInterceptor(func) {
+    this.__responseInterceptor = func;
+  }
+  clean() {
+    this.__queue = [];
+  }
 }
 
-Http.prototype.request = function(
-  method = requireArgument('method'),
-  url = requireArgument('url'),
-  body = '',
-  header = {},
-  dataType = 'json'
-) {
-  const _this = this;
-  const config = {
-    method,
-    url,
-    data: body,
-    header,
-    dataType
-  };
-  return new Promise(function(resolve, reject) {
-    _this.__queue.push({ config, promise: this, resolve, reject });
-    _this.__next();
-  });
-};
-
-Http.prototype.__next = function() {
-  const _this = this;
-  const queue = _this.__queue;
-
-  if (queue.length && _this.__runningTask < _this.__maxConcurrent) {
-    const entity = queue.shift();
-    const config = entity.config;
-
-    const requestInterceptor = _this.__requestInterceptor;
-    const responseInterceptor = _this.__responseInterceptor;
-    const onError = _this.__onError;
-    const onRequest = _this.__onRequest;
-    const onSuccess = _this.__onSuccess;
-    const onComplete = _this.__onComplete;
-    const onFail = _this.__onFail;
-
-    if (
-      isFunction(requestInterceptor) &&
-      requestInterceptor.call(_this, config) !== true
-    ) {
-      entity.reject(
-        new Error(`Request Interceptor: Request can\'t pass the Interceptor`)
-      );
-      return;
-    }
-
-    if (isFunction(onRequest)) {
-      try {
-        onRequest.call(_this, config);
-      } catch (err) {
-        isFunction(onError) && onError.call(_this, err);
-      }
-    }
-
-    _this.__runningTask = _this.__runningTask + 1;
-    _this.__ctx.request({
-      ...entity.config,
-      ...{
-        success(res) {
-          entity.__response = res;
-          if (isFunction(onSuccess)) {
-            try {
-              onSuccess.call(_this, config, res);
-            } catch (err) {
-              isFunction(onError) && onError.call(_this, err);
-            }
-          }
-          if (
-            isFunction(responseInterceptor) &&
-            responseInterceptor.call(_this, config, res) !== true
-          ) {
-            entity.reject(res);
-          } else {
-            entity.resolve(res);
-          }
-        },
-        fail(err) {
-          entity.__response = err;
-          if (isFunction(onFail)) {
-            try {
-              onFail.call(_this, config, err);
-            } catch (error) {
-              isFunction(onError) && onError.call(_this, error);
-            }
-          }
-          if (
-            isFunction(responseInterceptor) &&
-            responseInterceptor.call(_this, config, err) === true
-          ) {
-            entity.resolve(err);
-          } else {
-            entity.reject(err);
-          }
-        },
-        complete() {
-          if (isFunction(onComplete)) {
-            try {
-              onComplete.call(_this, config, entity.__response);
-            } catch (err) {
-              isFunction(onError) && onError.call(_this, err);
-            }
-          }
-          _this.__next();
-          _this.__runningTask = _this.__runningTask - 1;
-        }
-      }
-    });
-  } else {
-  }
-};
-
-METHODS.forEach(method => {
-  Http.prototype[method.toLowerCase()] = function(url, body, header, dataType) {
-    return this.request(method, url, body, header, dataType);
-  };
-});
-
-Http.prototype.requestInterceptor = function(func) {
-  this.__requestInterceptor = func;
-};
-
-Http.prototype.responseInterceptor = function(func) {
-  this.__responseInterceptor = func;
-};
-
-Http.prototype.onRequest = function(func) {
-  this.__onRequest = func;
-};
-
-Http.prototype.onSuccess = function(func) {
-  this.__onSuccess = func;
-};
-
-Http.prototype.onFail = function(func) {
-  this.__onFail = func;
-};
-
-Http.prototype.onError = function(func) {
-  this.__onError = func;
-};
-
-Http.prototype.onComplete = function(func) {
-  this.__onComplete = func;
-};
-
-Http.prototype.clean = function() {
-  this.__queue = [];
-};
-
 export default new Http(5);
+export { Http };

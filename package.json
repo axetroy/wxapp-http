@@ -35,5 +35,8 @@
     "babel-preset-es2015": "^6.24.0",
     "gh-pages": "^1.0.0",
     "webpack": "^3.0.0"
+  },
+  "dependencies": {
+    "@axetroy/event-emitter.js": "^1.2.1"
   }
 }
