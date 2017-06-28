@@ -21,10 +21,13 @@ npm install wxapp-http
 
 - [x] 更优雅的API
 - [x] http请求的拦截器
-- [x] http请求的事件监听器, 发布订阅者模式(基于[@axetroy/event-emitter.js](https://github.com/axetroy/event-emitter.js))
+- [x] http请求的事件监听器
 - [x] http请求返回promise
 - [x] http请求队列化，规避小程序的并发限制
 - [x] 自定义http请求的最高并发数量
+
+TODO: 
+> 1.0.0正式版本将基于[@axetroy/event-emitter.js](https://github.com/axetroy/event-emitter.js) 事件管理将实现真正的发布/订阅者模式
 
 ## Usage
 
@@ -145,36 +148,69 @@ http.responseInterceptor(function(config, response){
 
 监听全局的http请求
 
+#### 请求发出前
+
 ```typescript
-http.prototype.on = function(listener : (event:string, [...data])=> void){
+Http.prototype.onRequest = function(func:(config: Config$)=> void): void{
   
 }
 
-// example
-http.on('request', function(config){
-  
+
+http.onRequest(function(config){
+  console.log(`will send http request: `, config.url);
 });
 
-http.on('success', function(config, response){
-  
-});
+```
 
-http.on('fail', function(config, response){
-  
-});
+#### 请求成功后
 
-http.on('complete', function(config, response){
+```typescript
+Http.prototype.onSuccess = function(func:(config: Config$, response: Response$)=> void): void{
   
+}
+
+http.onSuccess(function(config, response){
+  console.log(`http request done: `, config.url);
 });
 ```
 
-事件: [request, success, fail, complete]
+#### 请求失败后
 
-参数: [config, response]
+```typescript
+Http.prototype.onFail = function(func:(config: Config$, response: Response$)=> void): void{
+  
+}
 
-[查看更多事件API](https://github.com/axetroy/event-emitter.js)
+http.onFail(function(config, response){
+  console.log(`http request fail: `, config.url);
+});
+```
 
-### 事件触发顺序
+#### 请求完成后，无论成功或者失败
+
+```typescript
+Http.prototype.onComplete = function(func:(config: Config$, response: Response$)=> void): void{
+  
+}
+
+http.onComplete(function(config, response){
+  console.log(`http request complete: `, config.url);
+});
+```
+
+#### 错误监听
+
+```typescript
+Http.prototype.onError = function(func:(error: Error)=> void): void{
+  
+}
+
+http.onError(function(error){
+  console.error(error);
+});
+```
+
+### 生命周期
 
 ```
         requestInterceptor 
@@ -186,6 +222,7 @@ http.on('complete', function(config, response){
         responseInterceptor
                 ↓
             onComplete
+    (onError run in hole life circle)
 ```
 
 ### 清除请求队列
