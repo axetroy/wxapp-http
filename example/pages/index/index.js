@@ -2,6 +2,14 @@
 
 const http = require('../../wxapp-http').default;
 
+http.requestInterceptor(function(config) {
+  return true;
+});
+
+http.responseInterceptor(function(config) {
+  return true;
+});
+
 var app = getApp();
 Page({
   data: {
@@ -21,7 +29,7 @@ Page({
           this.setData({ success });
         })
         .catch(err => {
-          console.log(`Request Error: `, err);
+          console.error(`Request Error: `, err);
           const fail = this.data.fail + 1;
           this.setData({ fail });
         });
