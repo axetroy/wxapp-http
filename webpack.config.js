@@ -4,8 +4,8 @@ const path = require('path');
 // webpack.config.js
 module.exports = {
   entry: {
-    '/dist': path.join(__dirname, 'index.js'),
-    '/example': path.join(__dirname, 'index.js')
+    '/dist': path.join(__dirname, 'index.ts'),
+    '/example': path.join(__dirname, 'index.ts')
   },
   output: {
     filename: '[name]/wxapp-http.js',
@@ -13,7 +13,7 @@ module.exports = {
     libraryTarget: 'umd'
   },
   resolve: {
-    extensions: ['.js', '.coffee']
+    extensions: ['.js', '.coffee', '.ts']
   },
   module: {
     loaders: [
@@ -21,7 +21,8 @@ module.exports = {
         test: /\.(jsx|js)?$/,
         exclude: /(node_modules|bower_components)/,
         loader: 'babel-loader'
-      }
+      },
+      { test: /\.tsx?$/, loader: 'ts-loader' }
     ]
   },
   plugins: [
