@@ -23,7 +23,8 @@ npm install wxapp-http
 - [x] http请求的拦截器
 - [x] http请求的事件监听器
 - [x] http请求返回promise
-- [x] http请求队列化，最大并发数量永远不会超过5个，规避小程序的并发限制
+- [x] http请求队列化，规避小程序的并发限制
+- [x] 自定义http请求的最高并发数量
 
 ## Usage
 
