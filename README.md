@@ -19,7 +19,7 @@ npm install wxapp-http
 
 ## Features
 
-- [x] 更优雅的语法
+- [x] 更优雅的API
 - [x] http请求的拦截器
 - [x] http请求的时间监听器
 - [x] http请求返回promise
