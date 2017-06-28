@@ -6,7 +6,7 @@
   "scripts": {
     "test": "ava",
     "build": "webpack --display-error-details --progress --colors",
-    "watch": "webpack --display-error-details --progress --colors --watch",
+    "start": "webpack --display-error-details --progress --colors --watch",
     "generate": "all-contributors generate",
     "deploy": "gh-pages -d ./dist"
   },
