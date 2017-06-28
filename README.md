@@ -26,6 +26,9 @@ npm install wxapp-http
 - [x] http请求队列化，规避小程序的并发限制
 - [x] 自定义http请求的最高并发数量
 
+TODO: 
+> 1.0.0正式版本将基于[@axetroy/event-emitter.js](https://github.com/axetroy/event-emitter.js) 事件管理将实现真正的发布/订阅者模式
+
 ## Usage
 
 ```javascript
