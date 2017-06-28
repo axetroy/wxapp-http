@@ -1,6 +1,6 @@
 {
   "name": "wxapp-http",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Http module for WeChat APP",
   "main": "./dist/index.js",
   "scripts": {
