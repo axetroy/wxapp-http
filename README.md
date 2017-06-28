@@ -133,6 +133,11 @@ Http.prototype.onRequest = function(func:(config: Config$)=> void): void{
   
 }
 
+
+http.onRequest(function(config){
+  console.log(`will send http request: `, config.url);
+});
+
 ```
 
 #### 请求成功后
@@ -142,6 +147,9 @@ Http.prototype.onSuccess = function(func:(config: Config$)=> void): void{
   
 }
 
+http.onSuccess(function(config){
+  console.log(`http request done: `, config.url);
+});
 ```
 
 #### 请求失败后
@@ -151,6 +159,9 @@ Http.prototype.onFail = function(func:(config: Config$)=> void): void{
   
 }
 
+http.onFail(function(config){
+  console.log(`http request fail: `, config.url);
+});
 ```
 
 #### 请求完成后，无论成功或者失败
@@ -160,15 +171,21 @@ Http.prototype.onComplete = function(func:(config: Config$)=> void): void{
   
 }
 
+http.onComplete(function(config){
+  console.log(`http request complete: `, config.url);
+});
 ```
 
 #### 错误监听
 
 ```typescript
-Http.prototype.onError = function(func:(config: Config$)=> void): void{
+Http.prototype.onError = function(func:(error: Error)=> void): void{
   
 }
 
+http.onError(function(error){
+  console.error(error);
+});
 ```
 
 ### 生命周期
@@ -194,6 +211,8 @@ Http.prototype.onError = function(func:(config: Config$)=> void): void{
 Http.prototype.clean = function() : void{
   
 }
+
+http.clean();
 ```
 
 ## Contributing
