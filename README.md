@@ -104,7 +104,7 @@ interface Config${
 
 #### 请求拦截器
 
-返回布尔值，如果为true，则允许发送请求，如果为false，则拒绝发送请求
+返回布尔值，如果为true，则允许发送请求，如果为false，则拒绝发送请求，并且返回的promise进入reject阶段
 
 ```typescript
 Http.prototype.requestInterceptor = function(func:(config: Config$)=> boolean): void{
@@ -176,14 +176,14 @@ Http.prototype.onError = function(func:(config: Config$)=> void): void{
 ```
         requestInterceptor 
                 ↓
-            onRequest _______________
-            ↙    ↘                 ↘
-     onSuccess    onFail            onComplete
+            onRequest
+            ↙    ↘
+     onSuccess    onFail
             ↘    ↙
         responseInterceptor
-        
-        
-        (onError run in hole life circle)
+                ↓
+            onComplete
+    (onError run in hole life circle)
 ```
 
 ### 清除请求队列
