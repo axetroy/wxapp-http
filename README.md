@@ -51,7 +51,7 @@ http.get('https://www.google.com')
 Response返回的结构体
 
 ```typescript
-interface Response{
+interface Response${
   data: any,
   errMsg: string,
   header: Object,
@@ -62,7 +62,7 @@ interface Response{
 #### http.request
 
 ```typescript
-Http.prototype.request = function(method:string, url:string, body?:Object | string="", headers?: Object={}, dataType?: String="json"): Promise<Response>{
+Http.prototype.request = function(method:string, url:string, body?:Object | string="", headers?: Object={}, dataType?: String="json"): Promise<Response$>{
   
 }
 ```
@@ -70,7 +70,7 @@ Http.prototype.request = function(method:string, url:string, body?:Object | stri
 #### http.get
 
 ```typescript
-Http.prototype.get = function(url:string, body?:Object | string="", headers?: Object={}, dataType?: String="json"): Promise<Response>{
+Http.prototype.get = function(url:string, body?:Object | string="", headers?: Object={}, dataType?: String="json"): Promise<Response$>{
   
 }
 ```
@@ -78,7 +78,7 @@ Http.prototype.get = function(url:string, body?:Object | string="", headers?: Ob
 #### http.post
 
 ```typescript
-Http.prototype.post = function(url:string, body?:Object | string="", headers?: Object={}, dataType?: String="json"): Promise<Response>{
+Http.prototype.post = function(url:string, body?:Object | string="", headers?: Object={}, dataType?: String="json"): Promise<Response$>{
   
 }
 ```
@@ -110,6 +110,15 @@ interface Config${
 Http.prototype.requestInterceptor = function(func:(config: Config$)=> boolean): void{
   
 }
+
+http.requestInterceptor(function(config){
+  // 只允许发送http请求
+  if(config.url.indexOf('https')===0){
+    return true;
+  }else{
+    return false;
+  }
+});
 ```
 
 #### 响应拦截器
@@ -117,9 +126,18 @@ Http.prototype.requestInterceptor = function(func:(config: Config$)=> boolean): 
 返回布尔值，如果为true，则返回的promise进入resolve阶段，如果为false，则进入reject阶段
 
 ```typescript
-Http.prototype.responseInterceptor = function(func:(config: Config$)=> boolean): void{
+Http.prototype.responseInterceptor = function(func:(config: Config$, response: Response$)=> boolean): void{
   
 }
+
+http.responseInterceptor(function(config, response){
+  // 如果服务器返回null，则进入reject
+  if(response && response.data!==null){
+    return true;
+  }else{
+    return false;
+  }
+});
 ```
 
 ### 监听器
@@ -143,11 +161,11 @@ http.onRequest(function(config){
 #### 请求成功后
 
 ```typescript
-Http.prototype.onSuccess = function(func:(config: Config$)=> void): void{
+Http.prototype.onSuccess = function(func:(config: Config$, response: Response$)=> void): void{
   
 }
 
-http.onSuccess(function(config){
+http.onSuccess(function(config, response){
   console.log(`http request done: `, config.url);
 });
 ```
@@ -155,11 +173,11 @@ http.onSuccess(function(config){
 #### 请求失败后
 
 ```typescript
-Http.prototype.onFail = function(func:(config: Config$)=> void): void{
+Http.prototype.onFail = function(func:(config: Config$, response: Response$)=> void): void{
   
 }
 
-http.onFail(function(config){
+http.onFail(function(config, response){
   console.log(`http request fail: `, config.url);
 });
 ```
