@@ -185,11 +185,11 @@ http.onFail(function(config, response){
 #### 请求完成后，无论成功或者失败
 
 ```typescript
-Http.prototype.onComplete = function(func:(config: Config$)=> void): void{
+Http.prototype.onComplete = function(func:(config: Config$, response: Response$)=> void): void{
   
 }
 
-http.onComplete(function(config){
+http.onComplete(function(config, response){
   console.log(`http request complete: `, config.url);
 });
 ```
