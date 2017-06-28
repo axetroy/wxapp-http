@@ -112,7 +112,7 @@ Http.prototype.requestInterceptor = function(func:(config: Config$)=> boolean): 
 }
 
 http.requestInterceptor(function(config){
-  // 只允许发送http请求
+  // 只允许发送https请求
   if(config.url.indexOf('https')===0){
     return true;
   }else{
@@ -239,8 +239,11 @@ http.clean();
 git clone https://github.com/axetroy/wxapp-http.git
 cd ./wxapp-http
 yarn
-yarn run build
+yarn run start
 ```
+
+1. 打开微信web开发者工具， 加载wxapp-http/example目录
+2. 修改index.js
 
 You can flow [Contribute Guide](https://github.com/axetroy/wxapp-http/blob/master/contributing.md)
 
