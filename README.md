@@ -24,61 +24,173 @@ npm install wxapp-http
 ## Usage
 
 ```javascript
+
 // es6
 import http from 'wxapp-http';
+
+// commonJS
+const http = require('wxapp-http').default;
+
+http.get('https://www.google.com')
+    .then(function(response){
+      
+    })
+    .catch(function(error){
+      console.error(error);
+    });
 ```
 
 ## API
 
+### Response
+
+Response返回的结构体
+
+```typescript
+interface Response{
+  data: any,
+  errMsg: string,
+  header: Object,
+  statusCode: number
+}
+```
+
 #### http.request
 
-发送http请求
-
-```flow js
-http.request = function(
-  method: string,
-  url: string,
-  body?: Object | string,
-  header?: Object,
-  dataType?: string
-) {
-  // ...send request
-};
+```typescript
+Http.prototype.request = function(method:string, url:string, body?:Object | string="", headers?: Object={}, dataType?: String="json"): Promise<Response>{
+  
+}
 ```
 
 #### http.get
 
-发送GET请求
-
-```flow js
-http.get = function(
-  url: string,
-  body?: Object | string,
-  header?: Object,
-  dataType?: string
-) {
-  // ...send request
-};
+```typescript
+Http.prototype.get = function(url:string, body?:Object | string="", headers?: Object={}, dataType?: String="json"): Promise<Response>{
+  
+}
 ```
 
 #### http.post
 
-发送POST请求
-
-```flow js
-http.post = function(
-  url: string,
-  body?: Object | string,
-  header?: Object,
-  dataType?: string
-) {
-  // ...send request
-};
+```typescript
+Http.prototype.post = function(url:string, body?:Object | string="", headers?: Object={}, dataType?: String="json"): Promise<Response>{
+  
+}
 ```
 
 ...
 
-#### 以及OPTIONS, HEAD, PUT, DELETE, TRACE, CONNECT 请求
+#### 以及OPTIONS, HEAD, PUT, DELETE, TRACE, CONNECT 请求, 参数同上
+
+### 拦截器
+
+配置文件字段
+
+```typescript
+interface Config${
+  method: string,
+  url: string,
+  data: Object | string,
+  header: Object,
+  dataType: string
+}
+
+```
+
+#### 请求拦截器
+
+返回布尔值，如果为true，则允许发送请求，如果为false，则拒绝发送请求
+
+```typescript
+Http.prototype.requestInterceptor = function(func:(config: Config$)=> boolean): void{
+  
+}
+```
+
+#### 响应拦截器
+
+返回布尔值，如果为true，则返回的promise进入resolve阶段，如果为false，则进入reject阶段
+
+```typescript
+Http.prototype.responseInterceptor = function(func:(config: Config$)=> boolean): void{
+  
+}
+```
+
+### 监听器
+
+监听全局的http请求
+
+#### 请求发出前
+
+```typescript
+Http.prototype.onRequest = function(func:(config: Config$)=> void): void{
+  
+}
+
+```
+
+#### 请求成功后
+
+```typescript
+Http.prototype.onSuccess = function(func:(config: Config$)=> void): void{
+  
+}
+
+```
+
+#### 请求失败后
+
+```typescript
+Http.prototype.onFail = function(func:(config: Config$)=> void): void{
+  
+}
+
+```
+
+#### 请求完成后，无论成功或者失败
+
+```typescript
+Http.prototype.onComplete = function(func:(config: Config$)=> void): void{
+  
+}
+
+```
+
+#### 错误监听
+
+```typescript
+Http.prototype.onError = function(func:(config: Config$)=> void): void{
+  
+}
+
+```
+
+### 生命周期
+
+```
+        requestInterceptor 
+                ↓
+            onRequest _______________
+            ↙    ↘                 ↘
+     onSuccess    onFail            onComplete
+            ↘    ↙
+        responseInterceptor
+        
+        
+        (onError run in hole life circle)
+```
+
+### 清除请求队列
+
+适用于小程序页面切换后，取消掉未发出去的http请求.
+
+```typescript
+Http.prototype.clean = function() : void{
+  
+}
+```
 
 ## Contributing
 
