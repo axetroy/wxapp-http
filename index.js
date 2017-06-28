@@ -93,16 +93,17 @@ Http.prototype.__next = function() {
       ...entity.config,
       ...{
         success(res) {
+          entity.__response = res;
           if (isFunction(onSuccess)) {
             try {
-              onSuccess.call(_this, null, config, res);
+              onSuccess.call(_this, config, res);
             } catch (err) {
               isFunction(onError) && onError.call(_this, err);
             }
           }
           if (
             isFunction(responseInterceptor) &&
-            responseInterceptor.call(_this, config) !== true
+            responseInterceptor.call(_this, config, res) !== true
           ) {
             entity.reject(res);
           } else {
@@ -110,16 +111,17 @@ Http.prototype.__next = function() {
           }
         },
         fail(err) {
+          entity.__response = err;
           if (isFunction(onFail)) {
             try {
-              onFail.call(_this, err, config);
+              onFail.call(_this, config, err);
             } catch (error) {
               isFunction(onError) && onError.call(_this, error);
             }
           }
           if (
             isFunction(responseInterceptor) &&
-            responseInterceptor.call(_this, config) === true
+            responseInterceptor.call(_this, config, err) === true
           ) {
             entity.resolve(err);
           } else {
@@ -129,7 +131,7 @@ Http.prototype.__next = function() {
         complete() {
           if (isFunction(onComplete)) {
             try {
-              onComplete.call(_this, null, config);
+              onComplete.call(_this, config, entity.__response);
             } catch (err) {
               isFunction(onError) && onError.call(_this, err);
             }

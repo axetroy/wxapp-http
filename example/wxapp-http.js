@@ -163,28 +163,30 @@ Http.prototype.__next = function () {
     _this.__runningTask = _this.__runningTask + 1;
     _this.__ctx.request(_extends({}, entity.config, {
       success: function success(res) {
+        entity.__response = res;
         if (isFunction(onSuccess)) {
           try {
-            onSuccess.call(_this, null, config, res);
+            onSuccess.call(_this, config, res);
           } catch (err) {
             isFunction(onError) && onError.call(_this, err);
           }
         }
-        if (isFunction(responseInterceptor) && responseInterceptor.call(_this, config) !== true) {
+        if (isFunction(responseInterceptor) && responseInterceptor.call(_this, config, res) !== true) {
           entity.reject(res);
         } else {
           entity.resolve(res);
         }
       },
       fail: function fail(err) {
+        entity.__response = err;
         if (isFunction(onFail)) {
           try {
-            onFail.call(_this, err, config);
+            onFail.call(_this, config, err);
           } catch (error) {
             isFunction(onError) && onError.call(_this, error);
           }
         }
-        if (isFunction(responseInterceptor) && responseInterceptor.call(_this, config) === true) {
+        if (isFunction(responseInterceptor) && responseInterceptor.call(_this, config, err) === true) {
           entity.resolve(err);
         } else {
           entity.reject(err);
@@ -193,7 +195,7 @@ Http.prototype.__next = function () {
       complete: function complete() {
         if (isFunction(onComplete)) {
           try {
-            onComplete.call(_this, null, config);
+            onComplete.call(_this, config, entity.__response);
           } catch (err) {
             isFunction(onError) && onError.call(_this, err);
           }
