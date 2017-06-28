@@ -28,9 +28,11 @@ class Http extends EventEmitter implements Http$ {
       isFunction(this.requestInterceptor) &&
       this.requestInterceptor.call(this, config) !== true
     ) {
-      entity.reject(
-        new Error(`Request Interceptor: Request can\'t pass the Interceptor`)
-      );
+      entity.reject({
+        data: null,
+        errMsg: `Request Interceptor: Request can\'t pass the Interceptor`,
+        statusCode: 100
+      });
       return;
     }
 
