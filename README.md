@@ -233,6 +233,24 @@ Http.prototype.clean = function() : void{
 http.clean();
 ```
 
+### 自定义最高并发数量
+
+最高并发数量默认为5个
+
+```javascript
+import {Http} from 'wxapp-http';
+
+const http = new Http(3); // 设置最高并发3个
+
+http.get('https://www.google.com')
+    .then(function(response){
+      
+    })
+    .catch(function(error){
+      console.error(error);
+    });
+```
+
 ## Contributing
 
 ```bash
