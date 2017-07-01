@@ -20,8 +20,10 @@ class Http extends EventEmitter implements Http$ {
   private ctx: Wx$ = typeof wx === 'object' ? wx : { request() {} };
   private queue: Entity$[] = [];
   private runningTask: number = 0;
+  private maxConcurrent = DEFAULT_CONFIG.maxConcurrent;
   constructor(private config: HttpConfig$ = DEFAULT_CONFIG) {
     super();
+    this.maxConcurrent = config.maxConcurrent;
   }
   create(config: HttpConfig$ = DEFAULT_CONFIG): Http {
     return new Http(config);
@@ -29,7 +31,7 @@ class Http extends EventEmitter implements Http$ {
   private next(): void {
     const queue: Entity$[] = this.queue;
 
-    if (!queue.length || this.runningTask >= this.config.maxConcurrent) return;
+    if (!queue.length || this.runningTask >= this.maxConcurrent) return;
 
     const entity: Entity$ = queue.shift();
     const config: Config$ = entity.config;

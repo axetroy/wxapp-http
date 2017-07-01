@@ -121,6 +121,8 @@ var Http = (function (_super) {
         _this.ctx = typeof wx === 'object' ? wx : { request: function () { } };
         _this.queue = [];
         _this.runningTask = 0;
+        _this.maxConcurrent = DEFAULT_CONFIG.maxConcurrent;
+        _this.maxConcurrent = config.maxConcurrent;
         return _this;
     }
     Http.prototype.create = function (config) {
@@ -130,7 +132,7 @@ var Http = (function (_super) {
     Http.prototype.next = function () {
         var _this = this;
         var queue = this.queue;
-        if (!queue.length || this.runningTask >= this.config.maxConcurrent)
+        if (!queue.length || this.runningTask >= this.maxConcurrent)
             return;
         var entity = queue.shift();
         var config = entity.config;
