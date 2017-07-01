@@ -37,9 +37,9 @@
     ansi-styles "^2.2.1"
     esutils "^2.0.2"
 
-"@axetroy/event-emitter.js@^1.2.1":
-  version "1.2.1"
-  resolved "https://registry.npmjs.org/@axetroy/event-emitter.js/-/event-emitter.js-1.2.1.tgz#731a42cade2fe0de9a63e31c818f77658110506d"
+"@axetroy/event-emitter.js@^1.2.4":
+  version "1.2.4"
+  resolved "https://registry.npmjs.org/@axetroy/event-emitter.js/-/event-emitter.js-1.2.4.tgz#6366444b146ad56a035799d3baf0fe0a8812dcaa"
 
 abbrev@1:
   version "1.1.0"

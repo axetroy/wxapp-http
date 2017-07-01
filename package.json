@@ -2,7 +2,8 @@
   "name": "wxapp-http",
   "version": "1.0.0",
   "description": "Http module for WeChat APP",
-  "main": "./dist/index.js",
+  "main": "./dist/wxapp-http.js",
+  "typings": "index.d.ts",
   "scripts": {
     "test": "ava",
     "build": "webpack --display-error-details --progress --colors",
@@ -39,6 +40,6 @@
     "webpack": "^3.0.0"
   },
   "dependencies": {
-    "@axetroy/event-emitter.js": "^1.2.1"
+    "@axetroy/event-emitter.js": "^1.2.4"
   }
 }

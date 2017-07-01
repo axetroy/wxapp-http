@@ -23,11 +23,15 @@ interface RequestCallBack$ {
   complete(): void;
 }
 
+interface HttpRequestHeader$ {
+  [s: string]: string;
+}
+
 interface Config$ {
   url: string;
   method: string;
   data: Object | string;
-  header: Object;
+  header: HttpRequestHeader$;
   dataType: String;
 }
 
@@ -39,6 +43,7 @@ interface Entity$ {
 }
 
 interface Http$ {
+  create(config: HttpConfig$): Http$;
   request(
     method: string,
     url: string,
@@ -99,9 +104,9 @@ interface Http$ {
   clean(): void;
 }
 
-declare module '@axetroy/event-emitter.js' {
-  export default class EventEmitter {
-    on(event: string, handler: Function): Function;
-    emit(event: string, ...data: any[]): void;
-  }
+interface HttpConfig$ {
+  maxConcurrent: number;
+  timeout: number;
+  header: HttpRequestHeader$;
+  dataType: string;
 }

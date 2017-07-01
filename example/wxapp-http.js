@@ -93,32 +93,54 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var event_emitter_js_1 = __webpack_require__(1);
 function isFunction(func) {
     return typeof func === 'function';
 }
+var DEFAULT_CONFIG = {
+    maxConcurrent: 5,
+    timeout: 0,
+    header: {},
+    dataType: 'json'
+};
 var Http = (function (_super) {
     __extends(Http, _super);
-    function Http(maxConcurrent) {
-        if (maxConcurrent === void 0) { maxConcurrent = 5; }
+    function Http(config) {
+        if (config === void 0) { config = DEFAULT_CONFIG; }
         var _this = _super.call(this) || this;
-        _this.maxConcurrent = maxConcurrent;
+        _this.config = config;
         _this.ctx = typeof wx === 'object' ? wx : { request: function () { } };
         _this.queue = [];
         _this.runningTask = 0;
         return _this;
     }
+    Http.prototype.create = function (config) {
+        if (config === void 0) { config = DEFAULT_CONFIG; }
+        return new Http(config);
+    };
     Http.prototype.next = function () {
         var _this = this;
         var queue = this.queue;
-        if (queue.length || this.runningTask >= this.maxConcurrent)
+        if (!queue.length || this.runningTask >= this.config.maxConcurrent)
             return;
         var entity = queue.shift();
         var config = entity.config;
         if (isFunction(this.requestInterceptor) &&
             this.requestInterceptor.call(this, config) !== true) {
-            entity.reject(new Error("Request Interceptor: Request can't pass the Interceptor"));
+            entity.reject({
+                data: null,
+                errMsg: "Request Interceptor: Request can't pass the Interceptor",
+                statusCode: 100
+            });
             return;
         }
         this.emit('request', config);
@@ -164,8 +186,8 @@ var Http = (function (_super) {
             method: method,
             url: url,
             data: data,
-            header: header,
-            dataType: dataType
+            header: __assign({}, header, this.config.header),
+            dataType: dataType || this.config.dataType
         };
         return new Promise(function (resolve, reject) {
             var entity = { config: config, resolve: resolve, reject: reject, response: null };
@@ -210,8 +232,7 @@ var Http = (function (_super) {
     };
     return Http;
 }(event_emitter_js_1.default));
-exports.Http = Http;
-exports.default = new Http(5);
+exports.default = new Http();
 
 
 /***/ }),
@@ -298,11 +319,15 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /**
  * Created by axetroy on 2017/3/6.
  */
+/// <reference path="./index.d.ts" />
+
 var name = '@axetroy/event-emitter.js';
 var id_Identifier = '__id__';
 
@@ -368,7 +393,7 @@ prototype.emit = function () {
       argv = [].slice.call(arguments),
       event = argv.shift(),
       events = self[name];
-  (events['*'] || []).concat(events[event] || []).forEach(function (listener) {
+  (events['*'] || []).concat(events[event] || []).map(function (listener) {
     return self.emitting(event, argv, listener);
   });
 };
@@ -377,7 +402,7 @@ prototype.emitting = function (event, dataArray, listener) {
   listener.apply(this, dataArray);
 };
 
-module.exports = EventEmitter;
+/* harmony default export */ __webpack_exports__["default"] = EventEmitter;
 
 /***/ })
 /******/ ]);

@@ -9,17 +9,27 @@ function isFunction(func: any): boolean {
   return typeof func === 'function';
 }
 
+const DEFAULT_CONFIG: HttpConfig$ = {
+  maxConcurrent: 5,
+  timeout: 0,
+  header: {},
+  dataType: 'json'
+};
+
 class Http extends EventEmitter implements Http$ {
   private ctx: Wx$ = typeof wx === 'object' ? wx : { request() {} };
   private queue: Entity$[] = [];
   private runningTask: number = 0;
-  constructor(private maxConcurrent: number = 5) {
+  constructor(private config: HttpConfig$ = DEFAULT_CONFIG) {
     super();
+  }
+  create(config: HttpConfig$ = DEFAULT_CONFIG): Http {
+    return new Http(config);
   }
   private next(): void {
     const queue: Entity$[] = this.queue;
 
-    if (queue.length || this.runningTask >= this.maxConcurrent) return;
+    if (!queue.length || this.runningTask >= this.config.maxConcurrent) return;
 
     const entity: Entity$ = queue.shift();
     const config: Config$ = entity.config;
@@ -79,15 +89,15 @@ class Http extends EventEmitter implements Http$ {
     method: string,
     url: string,
     data: Object | string = '',
-    header: Object = {},
+    header: HttpRequestHeader$ = {},
     dataType: string = 'json'
   ): Promise<Response$> {
     const config: Config$ = {
       method,
       url,
       data,
-      header,
-      dataType
+      header: { ...header, ...this.config.header },
+      dataType: dataType || this.config.dataType
     };
     return new Promise((resolve, reject) => {
       const entity: Entity$ = { config, resolve, reject, response: null };
@@ -98,7 +108,7 @@ class Http extends EventEmitter implements Http$ {
   head(
     url: string,
     data?: Object | string,
-    header?: Object,
+    header?: HttpRequestHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('HEAD', url, data, header, dataType);
@@ -106,7 +116,7 @@ class Http extends EventEmitter implements Http$ {
   options(
     url: string,
     data?: Object | string,
-    header?: Object,
+    header?: HttpRequestHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('OPTIONS', url, data, header, dataType);
@@ -114,7 +124,7 @@ class Http extends EventEmitter implements Http$ {
   get(
     url: string,
     data?: Object | string,
-    header?: Object,
+    header?: HttpRequestHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('GET', url, data, header, dataType);
@@ -122,7 +132,7 @@ class Http extends EventEmitter implements Http$ {
   post(
     url: string,
     data?: Object | string,
-    header?: Object,
+    header?: HttpRequestHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('POST', url, data, header, dataType);
@@ -130,7 +140,7 @@ class Http extends EventEmitter implements Http$ {
   put(
     url: string,
     data?: Object | string,
-    header?: Object,
+    header?: HttpRequestHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('PUT', url, data, header, dataType);
@@ -138,7 +148,7 @@ class Http extends EventEmitter implements Http$ {
   ['delete'](
     url: string,
     data?: Object | string,
-    header?: Object,
+    header?: HttpRequestHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('DELETE', url, data, header, dataType);
@@ -146,7 +156,7 @@ class Http extends EventEmitter implements Http$ {
   trace(
     url: string,
     data?: Object | string,
-    header?: Object,
+    header?: HttpRequestHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('TRACE', url, data, header, dataType);
@@ -154,7 +164,7 @@ class Http extends EventEmitter implements Http$ {
   connect(
     url: string,
     data?: Object | string,
-    header?: Object,
+    header?: HttpRequestHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('CONNECT', url, data, header, dataType);
@@ -172,5 +182,4 @@ class Http extends EventEmitter implements Http$ {
   }
 }
 
-export default new Http(5);
-export { Http };
+export default new Http();
