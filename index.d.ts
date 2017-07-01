@@ -13,6 +13,7 @@ interface Response$ {
   data: any;
   errMsg: string;
   statusCode: number;
+  header: HttpHeader$;
 }
 
 interface RequestConfig$ extends RequestCallBack$, Config$ {}
@@ -23,7 +24,7 @@ interface RequestCallBack$ {
   complete(): void;
 }
 
-interface HttpRequestHeader$ {
+interface HttpHeader$ {
   [s: string]: string;
 }
 
@@ -31,7 +32,7 @@ interface Config$ {
   url: string;
   method: string;
   data: Object | string;
-  header: HttpRequestHeader$;
+  header: HttpHeader$;
   dataType: String;
 }
 
@@ -107,6 +108,6 @@ interface Http$ {
 interface HttpConfig$ {
   maxConcurrent: number;
   timeout: number;
-  header: HttpRequestHeader$;
+  header: HttpHeader$;
   dataType: string;
 }

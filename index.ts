@@ -89,7 +89,7 @@ class Http extends EventEmitter implements Http$ {
     method: string,
     url: string,
     data: Object | string = '',
-    header: HttpRequestHeader$ = {},
+    header: HttpHeader$ = {},
     dataType: string = 'json'
   ): Promise<Response$> {
     const config: Config$ = {
@@ -108,7 +108,7 @@ class Http extends EventEmitter implements Http$ {
   head(
     url: string,
     data?: Object | string,
-    header?: HttpRequestHeader$,
+    header?: HttpHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('HEAD', url, data, header, dataType);
@@ -116,7 +116,7 @@ class Http extends EventEmitter implements Http$ {
   options(
     url: string,
     data?: Object | string,
-    header?: HttpRequestHeader$,
+    header?: HttpHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('OPTIONS', url, data, header, dataType);
@@ -124,7 +124,7 @@ class Http extends EventEmitter implements Http$ {
   get(
     url: string,
     data?: Object | string,
-    header?: HttpRequestHeader$,
+    header?: HttpHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('GET', url, data, header, dataType);
@@ -132,7 +132,7 @@ class Http extends EventEmitter implements Http$ {
   post(
     url: string,
     data?: Object | string,
-    header?: HttpRequestHeader$,
+    header?: HttpHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('POST', url, data, header, dataType);
@@ -140,7 +140,7 @@ class Http extends EventEmitter implements Http$ {
   put(
     url: string,
     data?: Object | string,
-    header?: HttpRequestHeader$,
+    header?: HttpHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('PUT', url, data, header, dataType);
@@ -148,7 +148,7 @@ class Http extends EventEmitter implements Http$ {
   ['delete'](
     url: string,
     data?: Object | string,
-    header?: HttpRequestHeader$,
+    header?: HttpHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('DELETE', url, data, header, dataType);
@@ -156,7 +156,7 @@ class Http extends EventEmitter implements Http$ {
   trace(
     url: string,
     data?: Object | string,
-    header?: HttpRequestHeader$,
+    header?: HttpHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('TRACE', url, data, header, dataType);
@@ -164,7 +164,7 @@ class Http extends EventEmitter implements Http$ {
   connect(
     url: string,
     data?: Object | string,
-    header?: HttpRequestHeader$,
+    header?: HttpHeader$,
     dataType?: string
   ): Promise<Response$> {
     return this.request('CONNECT', url, data, header, dataType);
