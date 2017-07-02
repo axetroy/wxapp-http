@@ -4,7 +4,7 @@
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 [![Prettier](https://img.shields.io/badge/Code%20Style-Prettier-green.svg)](https://github.com/prettier/prettier)
 ![Node](https://img.shields.io/badge/node-%3E=6.0-blue.svg?style=flat-square)
-[![npm version](https://badge.fury.io/js/@axetroy/wxapp-http.svg)](https://badge.fury.io/js/wxapp-http)
+[![npm version](https://badge.fury.io/js/wxapp-http.svg)](https://badge.fury.io/js/wxapp-http)
 
 微信小程序的http模块，机智得“绕过”最大5个http并发的限制.
 
