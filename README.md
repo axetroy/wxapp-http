@@ -287,6 +287,12 @@ http.get('https://www.google.com')
     });
 ```
 
+## Related
+
+[wxapp-fetch](https://github.com/axetroy/wxapp-fetch) fetch API implement for WeCHat App
+
+[@axetroy/event-emitter.js](https://github.com/axetroy/event-emitter.js) A Javascript event emitter implementation without any dependencies. only 1.4Kb
+
 ## Contributing
 
 ```bash
