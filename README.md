@@ -197,11 +197,11 @@ interface Config$ {
 
 ```typescript
 interface Http${
-  requestInterceptor(interceptor: Function): Http$;
+  setRequestInterceptor(interceptor: (config: HttpConfig$) => boolean): Http$;
 }
 
 // example
-http.requestInterceptor(function(config){
+http.setRequestInterceptor(function(config){
   // 只允许发送https请求
   if(config.url.indexOf('https')===0){
     return true;
@@ -217,11 +217,13 @@ http.requestInterceptor(function(config){
 
 ```typescript
 interface Http${
-  responseInterceptor(interceptor: Function): Http$;
+  setResponseInterceptor(
+    interceptor: (config: HttpConfig$, response: Response$) => boolean
+  ): Http$;
 }
 
 //example
-http.responseInterceptor(function(config, response){
+http.setResponseInterceptor(function(config, response){
   // 如果服务器返回null，则进入reject
   if(response && response.data!==null){
     return true;
