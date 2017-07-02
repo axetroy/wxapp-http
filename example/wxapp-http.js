@@ -103,9 +103,6 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var event_emitter_js_1 = __webpack_require__(1);
-function isFunction(func) {
-    return typeof func === 'function';
-}
 var DEFAULT_CONFIG = {
     maxConcurrent: 5,
     timeout: 0,
@@ -122,6 +119,8 @@ var Http = (function (_super) {
         _this.queue = [];
         _this.runningTask = 0;
         _this.maxConcurrent = DEFAULT_CONFIG.maxConcurrent;
+        _this.requestInterceptor = function (config) { return true; };
+        _this.responseInterceptor = function (config, response) { return true; };
         _this.maxConcurrent = config.maxConcurrent;
         return _this;
     }
@@ -136,13 +135,15 @@ var Http = (function (_super) {
             return;
         var entity = queue.shift();
         var config = entity.config;
-        if (isFunction(this.requestInterceptor) &&
-            this.requestInterceptor.call(this, config) !== true) {
-            entity.reject({
+        var _a = this, requestInterceptor = _a.requestInterceptor, responseInterceptor = _a.responseInterceptor;
+        if (requestInterceptor.call(this, config) !== true) {
+            var response = {
                 data: null,
                 errMsg: "Request Interceptor: Request can't pass the Interceptor",
-                statusCode: 100
-            });
+                statusCode: 0,
+                header: {}
+            };
+            entity.reject(response);
             return;
         }
         this.emit('request', config);
@@ -151,24 +152,16 @@ var Http = (function (_super) {
             success: function (res) {
                 entity.response = res;
                 _this.emit('success', config, res);
-                if (isFunction(_this.responseInterceptor) &&
-                    _this.responseInterceptor.call(_this, config, res) !== true) {
-                    entity.reject(res);
-                }
-                else {
-                    entity.resolve(res);
-                }
+                responseInterceptor.call(_this, config, res) !== true
+                    ? entity.reject(res)
+                    : entity.resolve(res);
             },
-            fail: function (err) {
-                entity.response = err;
-                _this.emit('fail', config, err);
-                if (isFunction(_this.responseInterceptor) &&
-                    _this.responseInterceptor.call(_this, config, err) === true) {
-                    entity.resolve(err);
-                }
-                else {
-                    entity.reject(err);
-                }
+            fail: function (res) {
+                entity.response = res;
+                _this.emit('fail', config, res);
+                responseInterceptor.call(_this, config, res) !== true
+                    ? entity.reject(res)
+                    : entity.resolve(res);
             },
             complete: function () {
                 _this.emit('complete', config, entity.response);
@@ -221,12 +214,12 @@ var Http = (function (_super) {
     Http.prototype.connect = function (url, data, header, dataType) {
         return this.request('CONNECT', url, data, header, dataType);
     };
-    Http.prototype.requestInterceptor = function (func) {
-        this.requestInterceptor = func;
+    Http.prototype.setRequestInterceptor = function (interceptor) {
+        this.requestInterceptor = interceptor;
         return this;
     };
-    Http.prototype.responseInterceptor = function (func) {
-        this.responseInterceptor = func;
+    Http.prototype.setResponseInterceptor = function (interceptor) {
+        this.responseInterceptor = interceptor;
         return this;
     };
     Http.prototype.clean = function () {

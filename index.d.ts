@@ -100,8 +100,10 @@ interface Http$ {
     header?: Object,
     dataType?: string
   ): Promise<any>;
-  requestInterceptor(interceptor: Function): Http$;
-  responseInterceptor(interceptor: Function): Http$;
+  setRequestInterceptor(interceptor: (config: HttpConfig$) => boolean): Http$;
+  setResponseInterceptor(
+    interceptor: (config: HttpConfig$, response: Response$) => boolean
+  ): Http$;
   clean(): void;
 }
 

@@ -5,10 +5,6 @@
 
 import EventEmitter from '@axetroy/event-emitter.js';
 
-function isFunction(func: any): boolean {
-  return typeof func === 'function';
-}
-
 const DEFAULT_CONFIG: HttpConfig$ = {
   maxConcurrent: 5,
   timeout: 0,
@@ -21,6 +17,13 @@ class Http extends EventEmitter implements Http$ {
   private queue: Entity$[] = [];
   private runningTask: number = 0;
   private maxConcurrent = DEFAULT_CONFIG.maxConcurrent;
+  private requestInterceptor: (config: HttpConfig$) => boolean = (
+    config: HttpConfig$
+  ) => true;
+  private responseInterceptor: (
+    config: HttpConfig$,
+    response: Response$
+  ) => boolean = (config: HttpConfig$, response: Response$) => true;
   constructor(private config: HttpConfig$ = DEFAULT_CONFIG) {
     super();
     this.maxConcurrent = config.maxConcurrent;
@@ -36,15 +39,16 @@ class Http extends EventEmitter implements Http$ {
     const entity: Entity$ = queue.shift();
     const config: Config$ = entity.config;
 
-    if (
-      isFunction(this.requestInterceptor) &&
-      this.requestInterceptor.call(this, config) !== true
-    ) {
-      entity.reject({
+    const { requestInterceptor, responseInterceptor } = this;
+
+    if (requestInterceptor.call(this, config) !== true) {
+      let response: Response$ = {
         data: null,
         errMsg: `Request Interceptor: Request can\'t pass the Interceptor`,
-        statusCode: 100
-      });
+        statusCode: 0,
+        header: {}
+      };
+      entity.reject(response);
       return;
     }
 
@@ -53,29 +57,19 @@ class Http extends EventEmitter implements Http$ {
     this.runningTask = this.runningTask + 1;
 
     const callBack: RequestCallBack$ = {
-      success: (res: any): void => {
+      success: (res: Response$): void => {
         entity.response = res;
         this.emit('success', config, res);
-        if (
-          isFunction(this.responseInterceptor) &&
-          this.responseInterceptor.call(this, config, res) !== true
-        ) {
-          entity.reject(res);
-        } else {
-          entity.resolve(res);
-        }
+        responseInterceptor.call(this, config, res) !== true
+          ? entity.reject(res)
+          : entity.resolve(res);
       },
-      fail: (err: any): void => {
-        entity.response = err;
-        this.emit('fail', config, err);
-        if (
-          isFunction(this.responseInterceptor) &&
-          this.responseInterceptor.call(this, config, err) === true
-        ) {
-          entity.resolve(err);
-        } else {
-          entity.reject(err);
-        }
+      fail: (res: Response$): void => {
+        entity.response = res;
+        this.emit('fail', config, res);
+        responseInterceptor.call(this, config, res) !== true
+          ? entity.reject(res)
+          : entity.resolve(res);
       },
       complete: (): void => {
         this.emit('complete', config, entity.response);
@@ -171,12 +165,14 @@ class Http extends EventEmitter implements Http$ {
   ): Promise<Response$> {
     return this.request('CONNECT', url, data, header, dataType);
   }
-  requestInterceptor(func): Http {
-    this.requestInterceptor = func;
+  setRequestInterceptor(interceptor: (config: HttpConfig$) => boolean): Http {
+    this.requestInterceptor = interceptor;
     return this;
   }
-  responseInterceptor(func): Http {
-    this.responseInterceptor = func;
+  setResponseInterceptor(
+    interceptor: (config: HttpConfig$, response: Response$) => boolean
+  ): Http {
+    this.responseInterceptor = interceptor;
     return this;
   }
   clean(): void {
