@@ -12,16 +12,16 @@
 
 ## Installation
 ```bash
-npm install wxapp-http
+npm install wxapp-http --save
 ```
 
 [example](https://github.com/axetroy/wxapp-http/tree/master/example)
 
 ## Features
 
-- [x] 基于typescript构建，更严谨
+- [x] 使用typescript构建，更严谨
 - [x] 更优雅的API
-- [x] http请求的拦截器
+- [x] http请求的拦截器，轻松定义你的http请求
 - [x] http请求的事件监听器, 发布订阅者模式(基于[@axetroy/event-emitter.js](https://github.com/axetroy/event-emitter.js))
 - [x] http请求返回promise
 - [x] http请求队列化，规避小程序的并发限制
@@ -47,19 +47,6 @@ http.get('https://www.google.com')
 ```
 
 ## API
-
-### Response
-
-Response返回的结构体
-
-```typescript
-interface Response${
-  data: any,
-  errMsg: string,
-  header: Object,
-  statusCode: number
-}
-```
 
 #### http.request
 
@@ -105,77 +92,7 @@ interface Http${
 
 #### 以及OPTIONS, HEAD, PUT, DELETE, TRACE, CONNECT 请求, 参数同上
 
-**Http**类所有接口
-```typescript
-interface HttpConfig$ {
-  maxConcurrent: number;
-  timeout: number;
-  header: HttpHeader$;
-  dataType: string;
-}
-
-interface Http$ {
-  create(config: HttpConfig$): Http$;
-  request(
-    method: string,
-    url: string,
-    body: Object | string,
-    header: Object,
-    dataType: string
-  ): Promise<any>;
-  get(
-    url: string,
-    body?: Object | string,
-    header?: Object,
-    dataType?: string
-  ): Promise<any>;
-  post(
-    url: string,
-    body?: Object | string,
-    header?: Object,
-    dataType?: string
-  ): Promise<any>;
-  put(
-    url: string,
-    body?: Object | string,
-    header?: Object,
-    dataType?: string
-  ): Promise<any>;
-  ['delete'](
-    url: string,
-    body?: Object | string,
-    header?: Object,
-    dataType?: string
-  ): Promise<any>;
-  options(
-    url: string,
-    body?: Object | string,
-    header?: Object,
-    dataType?: string
-  ): Promise<any>;
-  trace(
-    url: string,
-    body?: Object | string,
-    header?: Object,
-    dataType?: string
-  ): Promise<any>;
-  head(
-    url: string,
-    body?: Object | string,
-    header?: Object,
-    dataType?: string
-  ): Promise<any>;
-  connect(
-    url: string,
-    body?: Object | string,
-    header?: Object,
-    dataType?: string
-  ): Promise<any>;
-  requestInterceptor(interceptor: Function): Http$;
-  responseInterceptor(interceptor: Function): Http$;
-  clean(): void;
-}
-```
+[相关接口定义](https://github.com/axetroy/wxapp-http/blob/master/index.d.ts)
 
 ### 拦截器
 
