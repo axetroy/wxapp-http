@@ -1,12 +1,10 @@
 # wxapp-http
-
-[![Greenkeeper badge](https://badges.greenkeeper.io/axetroy/wxapp-http.svg)](https://greenkeeper.io/)
 [![Build Status](https://travis-ci.org/axetroy/wxapp-http.svg?branch=master)](https://travis-ci.org/axetroy/wxapp-http)
 [![Dependency](https://david-dm.org/axetroy/wxapp-http.svg)](https://david-dm.org/axetroy/wxapp-http)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 [![Prettier](https://img.shields.io/badge/Code%20Style-Prettier-green.svg)](https://github.com/prettier/prettier)
 ![Node](https://img.shields.io/badge/node-%3E=6.0-blue.svg?style=flat-square)
-[![npm version](https://badge.fury.io/js/wxapp-http.svg)](https://badge.fury.io/js/wxapp-http)
+[![npm version](https://badge.fury.io/js/@axetroy/wxapp-http.svg)](https://badge.fury.io/js/wxapp-http)
 
 微信小程序的http模块，机智得“绕过”最大5个http并发的限制.
 
@@ -14,20 +12,22 @@
 
 ## Installation
 ```bash
-npm install wxapp-http --save
+npm install wxapp-http
 ```
 
 [example](https://github.com/axetroy/wxapp-http/tree/master/example)
 
 ## Features
 
-- [x] 使用typescript构建，更严谨
 - [x] 更优雅的API
-- [x] http请求的拦截器，轻松定义你的http请求
-- [x] http请求的事件监听器, 发布订阅者模式(基于[@axetroy/event-emitter.js](https://github.com/axetroy/event-emitter.js))
+- [x] http请求的拦截器
+- [x] http请求的事件监听器
 - [x] http请求返回promise
 - [x] http请求队列化，规避小程序的并发限制
 - [x] 自定义http请求的最高并发数量
+
+TODO: 
+> 1.0.0正式版本将基于[@axetroy/event-emitter.js](https://github.com/axetroy/event-emitter.js) 事件管理将实现真正的发布/订阅者模式
 
 ## Usage
 
@@ -50,43 +50,40 @@ http.get('https://www.google.com')
 
 ## API
 
+### Response
+
+Response返回的结构体
+
+```typescript
+interface Response${
+  data: any,
+  errMsg: string,
+  header: Object,
+  statusCode: number
+}
+```
+
 #### http.request
 
 ```typescript
-interface Http${
-    request(
-      method: string,
-      url: string,
-      body: Object | string,
-      header: Object,
-      dataType: string
-    ): Promise<any>;
+Http.prototype.request = function(method:string, url:string, body?:Object | string="", headers?: Object={}, dataType?: String="json"): Promise<Response$>{
+  
 }
 ```
 
 #### http.get
 
 ```typescript
-interface Http${
-    get(
-      url: string,
-      body?: Object | string,
-      header?: Object,
-      dataType?: string
-    ): Promise<any>;
+Http.prototype.get = function(url:string, body?:Object | string="", headers?: Object={}, dataType?: String="json"): Promise<Response$>{
+  
 }
 ```
 
 #### http.post
 
 ```typescript
-interface Http${
-    post(
-      url: string,
-      body?: Object | string,
-      header?: Object,
-      dataType?: string
-    ): Promise<any>;
+Http.prototype.post = function(url:string, body?:Object | string="", headers?: Object={}, dataType?: String="json"): Promise<Response$>{
+  
 }
 ```
 
@@ -94,20 +91,19 @@ interface Http${
 
 #### 以及OPTIONS, HEAD, PUT, DELETE, TRACE, CONNECT 请求, 参数同上
 
-[相关接口定义](https://github.com/axetroy/wxapp-http/blob/master/index.d.ts)
-
 ### 拦截器
 
 配置文件字段
 
 ```typescript
-interface Config$ {
-  url: string;
-  method: string;
-  data: Object | string;
-  header: HttpHeader$;
-  dataType: String;
+interface Config${
+  method: string,
+  url: string,
+  data: Object | string,
+  header: Object,
+  dataType: string
 }
+
 ```
 
 #### 请求拦截器
@@ -115,12 +111,11 @@ interface Config$ {
 返回布尔值，如果为true，则允许发送请求，如果为false，则拒绝发送请求，并且返回的promise进入reject阶段
 
 ```typescript
-interface Http${
-  setRequestInterceptor(interceptor: (config: HttpConfig$) => boolean): Http$;
+Http.prototype.requestInterceptor = function(func:(config: Config$)=> boolean): void{
+  
 }
 
-// example
-http.setRequestInterceptor(function(config){
+http.requestInterceptor(function(config){
   // 只允许发送https请求
   if(config.url.indexOf('https')===0){
     return true;
@@ -135,14 +130,11 @@ http.setRequestInterceptor(function(config){
 返回布尔值，如果为true，则返回的promise进入resolve阶段，如果为false，则进入reject阶段
 
 ```typescript
-interface Http${
-  setResponseInterceptor(
-    interceptor: (config: HttpConfig$, response: Response$) => boolean
-  ): Http$;
+Http.prototype.responseInterceptor = function(func:(config: Config$, response: Response$)=> boolean): void{
+  
 }
 
-//example
-http.setResponseInterceptor(function(config, response){
+http.responseInterceptor(function(config, response){
   // 如果服务器返回null，则进入reject
   if(response && response.data!==null){
     return true;
@@ -154,54 +146,71 @@ http.setResponseInterceptor(function(config, response){
 
 ### 监听器
 
-监听全局的http请求, 事件基于[@axetroy/event-emitter.js](https://github.com/axetroy/event-emitter.js)
+监听全局的http请求
+
+#### 请求发出前
 
 ```typescript
-declare class EventEmitter {
-  constructor();
-
-  on(event: string, listener: (...data: any[]) => void): () => void;
-
-  emit(event: string, ...data: any[]): void;
-
-  on(event: string, listener: (...data: any[]) => void): () => void;
-
-  off(event: string): void;
-
-  clear(): void;
-
-  emitting(event: string, dataArray: any[], listener: Function): void;
-}
-
-class Http extends EventEmitter{
+Http.prototype.onRequest = function(func:(config: Config$)=> void): void{
   
 }
 
-// example
-http.on('request', function(config){
-  
+
+http.onRequest(function(config){
+  console.log(`will send http request: `, config.url);
 });
 
-http.on('success', function(config, response){
-  
-});
+```
 
-http.on('fail', function(config, response){
-  
-});
+#### 请求成功后
 
-http.on('complete', function(config, response){
+```typescript
+Http.prototype.onSuccess = function(func:(config: Config$, response: Response$)=> void): void{
   
+}
+
+http.onSuccess(function(config, response){
+  console.log(`http request done: `, config.url);
 });
 ```
 
-事件: [request, success, fail, complete]
+#### 请求失败后
 
-参数: [config, response]
+```typescript
+Http.prototype.onFail = function(func:(config: Config$, response: Response$)=> void): void{
+  
+}
 
-[查看更多事件API](https://github.com/axetroy/event-emitter.js)
+http.onFail(function(config, response){
+  console.log(`http request fail: `, config.url);
+});
+```
 
-### 事件触发顺序
+#### 请求完成后，无论成功或者失败
+
+```typescript
+Http.prototype.onComplete = function(func:(config: Config$, response: Response$)=> void): void{
+  
+}
+
+http.onComplete(function(config, response){
+  console.log(`http request complete: `, config.url);
+});
+```
+
+#### 错误监听
+
+```typescript
+Http.prototype.onError = function(func:(error: Error)=> void): void{
+  
+}
+
+http.onError(function(error){
+  console.error(error);
+});
+```
+
+### 生命周期
 
 ```
         requestInterceptor 
@@ -213,6 +222,7 @@ http.on('complete', function(config, response){
         responseInterceptor
                 ↓
             onComplete
+    (onError run in hole life circle)
 ```
 
 ### 清除请求队列
@@ -220,32 +230,11 @@ http.on('complete', function(config, response){
 适用于小程序页面切换后，取消掉未发出去的http请求.
 
 ```typescript
-interface Http${
-  lean(): void;
+Http.prototype.clean = function() : void{
+  
 }
 
-// example
 http.clean();
-```
-
-### 自定义一个新的Http实例
-
-```typescript
-interface HttpConfig$ {
-  maxConcurrent: number;
-  timeout: number;
-  header: HttpHeader$;
-  dataType: string;
-}
-
-interface Http${
-  create(config: HttpConfig$): Http$;
-}
-
-// example
-import Http from 'wxapp-http';
-
-const newHttp = Http.create();
 ```
 
 ### 自定义最高并发数量
@@ -253,32 +242,9 @@ const newHttp = Http.create();
 最高并发数量默认为5个
 
 ```javascript
-import Http from 'wxapp-http';
+import {Http} from 'wxapp-http';
 
-const http = Http.create({maxConcurrent:3}); // 设置最高并发3个
-
-http.get('https://www.google.com')
-    .then(function(response){
-      
-    })
-    .catch(function(error){
-      console.error(error);
-    });
-```
-
-### 自定义全局的header
-
-每个http请求，都会带有这个header
-
-```javascript
-import Http from 'wxapp-http';
-
-const http = Http.create({
-  maxConcurrent: 5,
-  header: {
-    name: 'axetroy'
-  }
-});
+const http = new Http(3); // 设置最高并发3个
 
 http.get('https://www.google.com')
     .then(function(response){
@@ -288,12 +254,6 @@ http.get('https://www.google.com')
       console.error(error);
     });
 ```
-
-## Related
-
-[wxapp-fetch](https://github.com/axetroy/wxapp-fetch) fetch API implement for WeCHat App
-
-[@axetroy/event-emitter.js](https://github.com/axetroy/event-emitter.js) A Javascript event emitter implementation without any dependencies. only 1.4Kb
 
 ## Contributing
 
@@ -305,9 +265,7 @@ yarn run start
 ```
 
 1. 打开微信web开发者工具， 加载wxapp-http/example目录
-2. 修改index.ts
-
-欢迎PR.
+2. 修改index.js
 
 You can flow [Contribute Guide](https://github.com/axetroy/wxapp-http/blob/master/contributing.md)
 

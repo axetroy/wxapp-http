@@ -1,0 +1,7 @@
+<view>
+    100 http sending...
+    <view>
+        success: {{success}}
+        fail: {{fail}}
+    </view>
+</view>

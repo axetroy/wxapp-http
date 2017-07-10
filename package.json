@@ -1,20 +1,21 @@
 {
   "name": "wxapp-http",
-  "version": "0.1.0",
-  "description": "promisify the wx API",
-  "main": "./dist/index.js",
+  "version": "3.0.0",
+  "description": "Http module for WeChat APP",
+  "main": "./dist/wxapp-http.js",
+  "typings": "index.d.ts",
   "scripts": {
     "test": "ava",
     "build": "webpack --display-error-details --progress --colors",
-    "watch": "webpack --display-error-details --progress --colors --watch",
+    "start": "webpack --display-error-details --progress --colors --watch",
     "generate": "all-contributors generate",
     "deploy": "gh-pages -d ./dist"
   },
   "keywords": [
     "wxapp",
-    "promise",
+    "http",
     "wx",
-    "promisify"
+    "request"
   ],
   "repository": {
     "type": "git",
@@ -34,6 +35,11 @@
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-preset-es2015": "^6.24.0",
     "gh-pages": "^1.0.0",
+    "ts-loader": "^2.2.0",
+    "typescript": "^2.4.1",
     "webpack": "^3.0.0"
+  },
+  "dependencies": {
+    "@axetroy/event-emitter.js": "^1.2.4"
   }
 }
