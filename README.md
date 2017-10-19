@@ -8,7 +8,7 @@
 ![Node](https://img.shields.io/badge/node-%3E=6.0-blue.svg?style=flat-square)
 [![npm version](https://badge.fury.io/js/wxapp-http.svg)](https://badge.fury.io/js/wxapp-http)
 
-微信小程序的http模块，机智得“绕过”最大5个http并发的限制.
+微信小程序的http模块，机智得“绕过”最大10个http并发的限制.
 
 ![sceenshot](https://github.com/axetroy/wxapp-http/raw/master/screenshot.gif)
 
