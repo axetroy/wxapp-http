@@ -6,7 +6,7 @@
 import EventEmitter from '@axetroy/event-emitter.js';
 
 const DEFAULT_CONFIG: HttpConfig$ = {
-  maxConcurrent: 5,
+  maxConcurrent: 10,
   timeout: 0,
   header: {},
   dataType: 'json'
