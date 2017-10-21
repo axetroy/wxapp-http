@@ -56,8 +56,15 @@ class Http extends EventEmitter implements Http$ {
 
     this.runningTask = this.runningTask + 1;
 
+    let timer = null;
+    let aborted: boolean = false;
+    let finished: boolean = false;
+
     const callBack: RequestCallBack$ = {
       success: (res: Response$): void => {
+        if (aborted) return;
+        finished = true;
+        timer && clearTimeout(timer);
         entity.response = res;
         this.emit('success', config, res);
         responseInterceptor.call(this, config, res) !== true
@@ -65,6 +72,9 @@ class Http extends EventEmitter implements Http$ {
           : entity.resolve(res);
       },
       fail: (res: Response$): void => {
+        if (aborted) return;
+        finished = true;
+        timer && clearTimeout(timer);
         entity.response = res;
         this.emit('fail', config, res);
         responseInterceptor.call(this, config, res) !== true
@@ -72,6 +82,7 @@ class Http extends EventEmitter implements Http$ {
           : entity.resolve(res);
       },
       complete: (): void => {
+        if (aborted) return;
         this.emit('complete', config, entity.response);
         this.next();
         this.runningTask = this.runningTask - 1;
@@ -79,7 +90,17 @@ class Http extends EventEmitter implements Http$ {
     };
 
     const requestConfig: RequestConfig$ = Object.assign(config, callBack);
-    this.ctx.request(requestConfig);
+    const task = this.ctx.request(requestConfig);
+
+    if (this.config.timeout > 0) {
+      timer = setTimeout(() => {
+        if (!finished) {
+          aborted = true;
+          task && task.abort();
+          this.next();
+        }
+      }, this.config.timeout);
+    }
   }
   request(
     method: string,
