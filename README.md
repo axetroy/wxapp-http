@@ -293,6 +293,10 @@ http.get('https://www.google.com')
 
 [wxapp-fetch](https://github.com/axetroy/wxapp-fetch) fetch API implement for WeCHat App
 
+[wxapp-XMLHttpRequest](https://github.com/axetroy/wxapp-XMLHttpRequest) Web XMLHttpRequest implement for WeChat APP
+
+[wxapp-r2](https://github.com/axetroy/wxapp-r2) r2 implement in Wechat App client
+
 [@axetroy/event-emitter.js](https://github.com/axetroy/event-emitter.js) A Javascript event emitter implementation without any dependencies. only 1.4Kb
 
 ## Contributing
