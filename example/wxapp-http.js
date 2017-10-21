@@ -104,18 +104,18 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var event_emitter_js_1 = __webpack_require__(1);
 var DEFAULT_CONFIG = {
-    maxConcurrent: 5,
+    maxConcurrent: 10,
     timeout: 0,
     header: {},
     dataType: 'json'
 };
-var Http = (function (_super) {
+var Http = /** @class */ (function (_super) {
     __extends(Http, _super);
     function Http(config) {
         if (config === void 0) { config = DEFAULT_CONFIG; }
         var _this = _super.call(this) || this;
         _this.config = config;
-        _this.ctx = typeof wx === 'object' ? wx : { request: function () { } };
+        _this.ctx = wx;
         _this.queue = [];
         _this.runningTask = 0;
         _this.maxConcurrent = DEFAULT_CONFIG.maxConcurrent;
@@ -148,8 +148,15 @@ var Http = (function (_super) {
         }
         this.emit('request', config);
         this.runningTask = this.runningTask + 1;
+        var timer = null;
+        var aborted = false;
+        var finished = false;
         var callBack = {
             success: function (res) {
+                if (aborted)
+                    return;
+                finished = true;
+                timer && clearTimeout(timer);
                 entity.response = res;
                 _this.emit('success', config, res);
                 responseInterceptor.call(_this, config, res) !== true
@@ -157,6 +164,10 @@ var Http = (function (_super) {
                     : entity.resolve(res);
             },
             fail: function (res) {
+                if (aborted)
+                    return;
+                finished = true;
+                timer && clearTimeout(timer);
                 entity.response = res;
                 _this.emit('fail', config, res);
                 responseInterceptor.call(_this, config, res) !== true
@@ -164,13 +175,24 @@ var Http = (function (_super) {
                     : entity.resolve(res);
             },
             complete: function () {
+                if (aborted)
+                    return;
                 _this.emit('complete', config, entity.response);
                 _this.next();
                 _this.runningTask = _this.runningTask - 1;
             }
         };
         var requestConfig = Object.assign(config, callBack);
-        this.ctx.request(requestConfig);
+        var task = this.ctx.request(requestConfig);
+        if (this.config.timeout > 0) {
+            timer = setTimeout(function () {
+                if (!finished) {
+                    aborted = true;
+                    task && task.abort();
+                    _this.next();
+                }
+            }, this.config.timeout);
+        }
     };
     Http.prototype.request = function (method, url, data, header, dataType) {
         var _this = this;
