@@ -13,7 +13,7 @@ const DEFAULT_CONFIG: HttpConfig$ = {
 };
 
 class Http extends EventEmitter implements Http$ {
-  private ctx: Wx$ = typeof wx === 'object' ? wx : { request() {} };
+  private ctx: Wx$ = wx;
   private queue: Entity$[] = [];
   private runningTask: number = 0;
   private maxConcurrent = DEFAULT_CONFIG.maxConcurrent;
