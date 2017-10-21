@@ -1,12 +1,17 @@
 /**
  * Created by axetroy on 2017/6/28.
  */
+
+interface RequestTask${
+  abort():void
+}
+
 declare namespace wx {
-  function request(config: RequestConfig$): void;
+  function request(config: RequestConfig$): RequestTask$;
 }
 
 interface Wx$ {
-  request(config: RequestConfig$): void;
+  request(config: RequestConfig$): RequestTask$;
 }
 
 interface Response$ {
@@ -33,7 +38,7 @@ interface Config$ {
   method: string;
   data: Object | string;
   header: HttpHeader$;
-  dataType: String;
+  dataType: string;
 }
 
 interface Entity$ {
