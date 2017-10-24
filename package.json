@@ -29,7 +29,7 @@
   "homepage": "https://github.com/axetroy/wxapp-http#readme",
   "devDependencies": {
     "all-contributors-cli": "^4.5.1",
-    "ava": "^0.22.0",
+    "ava": "^0.23.0",
     "gh-pages": "^1.0.0",
     "ts-loader": "^3.0.5",
     "typescript": "^2.5.3",
